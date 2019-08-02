@@ -34,7 +34,7 @@ object Core extends App with LazyLogging {
     val fileContents = Source.fromFile("triangle.txt").getLines().toList
     println("### Lets print `triangle.txt` ###")
     fileContents.foreach(println)
-    println("######")
+    println("#################################")
     // this time will not sort them to not break logic.
     val linesToList = fileContents.filterNot(_.isEmpty).map { line =>
       line.split(" ").toList.map((s: String) => s.toInt)
@@ -43,23 +43,26 @@ object Core extends App with LazyLogging {
   }
 
   def sum(triangleValues: List[List[Int]]) = {
+    // temp Map on each pyramid step
     var tempMap = mutable.Map[Int, Int]()
+    // Path map on pyramid
     var pathMap = mutable.Map[Int, Int]()
+    // total minimum sum
     val minimumSum = triangleValues.reduceRight(
       (up, low) =>
         up zip {
           // case if its first iteration (it should be empty)
-          if(tempMap.nonEmpty) {
+          if (tempMap.nonEmpty) {
             pathMap += tempMap.toSeq.sorted.head
             tempMap.clear
           }
           low zip low.tail
         } map {
-          case (above, (left, right)) =>
+          case (top, (left, right)) =>
             val min = Math.min(left, right)
             // add temp path to temp path map
-            tempMap += (above+min) ->  min
-            above + Math.min(left, right)
+            tempMap += (top + min) -> min
+            top + Math.min(left, right)
         }
     )
     pathMap += tempMap.toSeq.sorted.head
